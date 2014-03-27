@@ -28,7 +28,7 @@ class RegisterServiceCompilerPass implements CompilerPassInterface {
 
             // Adjust the definitions
             $encryptorDefinition->setArguments(array($secretKey));
-            $subscriberDefinition->replaceArgument(1, '');
+            $subscriberDefinition->replaceArgument(2, '');
             $subscriberDefinition->addArgument(new Reference($encryptorServiceId));
         }
     }
