@@ -6,13 +6,24 @@
         
     <services>
         <!-- Encryption service(subscriber) for encrypt/decrypt entities properties -->    
-        <service id="tdm_doctrine_encrypt.orm_subscriber" class="TDM\DoctrineEncryptBundle\Subscribers\ORMDoctrineEncryptSubscriber" public="false">
+        <service id="tdm_doctrine_encrypt.orm_subscriber_encrypt" class="TDM\DoctrineEncryptBundle\Subscribers\ORM\ORMEncrypt" public="false">
             <argument type="service" id="annotation_reader" />
             <argument type="service" id="service_container" />
             <argument>%tdm_doctrine_encrypt.encryptor_class_name%</argument>
             <argument>%tdm_doctrine_encrypt.secret_key%</argument>
-            <tag name="doctrine.event_subscriber" />
+            <tag name="doctrine.event_listener" event="prePersist" priority="-1000"/>
+            <tag name="doctrine.event_listener" event="preUpdate" priority="-1000"/>
         </service>
-        <service id="tdm_doctrine_encrypt.subscriber" alias="tdm_doctrine_encrypt.orm_subscriber" />
+        <!-- Decryption service(subscriber) for encrypt/decrypt entities properties -->    
+        <service id="tdm_doctrine_encrypt.orm_subscriber_decrypt" class="TDM\DoctrineEncryptBundle\Subscribers\ORM\ORMDecrypt" public="false">
+            <argument type="service" id="annotation_reader" />
+            <argument type="service" id="service_container" />
+            <argument>%tdm_doctrine_encrypt.encryptor_class_name%</argument>
+            <argument>%tdm_doctrine_encrypt.secret_key%</argument>
+            <tag name="doctrine.event_subscriber" priority="1000"/>
+        </service>
+        <service id="tdm_doctrine_encrypt.subscriber.encrypt" alias="tdm_doctrine_encrypt.orm_subscriber_encrypt" />
+        <service id="tdm_doctrine_encrypt.subscriber.decrypt" alias="tdm_doctrine_encrypt.orm_subscriber_decrypt" />
+        
     </services>
 </container>

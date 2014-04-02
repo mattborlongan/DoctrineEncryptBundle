@@ -145,7 +145,7 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
         //Check if there is a custom handler for the field.
         $customMethod = $annotation->getHandlerMethod();
         $customService = $annotation->getHandlerService();
-        if ((!NULL === $customService) && (!NULL === $customMethod)) {
+        if ((NULL !== $customService) && (NULL !== $customMethod)) {
             $service = $this->getService($customService);
             // Check that the method is valid.
             if (!is_callable(array($service, $customMethod))) {

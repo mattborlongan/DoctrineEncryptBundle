@@ -23,14 +23,17 @@ class RegisterServiceCompilerPass implements CompilerPassInterface {
             $encryptorServiceId = $container->getParameter('tdm_doctrine_encrypt.encryptor_service');
 
             // Get the definitions
-            $subscriberDefinition = $this->getDefinition($container, 'tdm_doctrine_encrypt.subscriber');
             $encryptorDefinition = $this->getDefinition($container, $encryptorServiceId);
 
-            // Adjust the definitions
-            $encryptorDefinition->setArguments(array($secretKey));
-            $subscriberDefinition->replaceArgument(2, '');
-            $subscriberDefinition->addArgument(new Reference($encryptorServiceId));
+            $this->adjustDefinition($encryptorServiceId, $secretKey, $encryptorDefinition, $this->getDefinition($container, 'tdm_doctrine_encrypt.subscriber.encrypt'));
+            $this->adjustDefinition($encryptorServiceId, $secretKey, $encryptorDefinition, $this->getDefinition($container, 'tdm_doctrine_encrypt.subscriber.decrypt'));
         }
+    }
+
+    private function adjustDefinition($encryptorServiceId, $secretKey, $encryptorDefinition, $subscriberDefinition) {
+        $encryptorDefinition->setArguments(array($secretKey));
+        $subscriberDefinition->replaceArgument(2, '');
+        $subscriberDefinition->addArgument(new Reference($encryptorServiceId));
     }
 
     /**
