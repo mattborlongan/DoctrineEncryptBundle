@@ -60,7 +60,7 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
      * @param EncryptorServiceInterface|NULL $service (Optional)  An EncryptorServiceInterface.  
      * This allows for the use of dependency injection for the encrypters.
      */
-    public function __construct(Reader $annReader, ContainerInterface $container, $encryptorClass, $secretKey, EncryptorInterface $service = NULL) {
+    public function __construct(Reader $annReader, ContainerInterface $container, $encryptorClass, $secretKey, $systemSalt, EncryptorInterface $service = NULL) {
         $this->annReader = $annReader;
         $this->container = $container;
         if ($service instanceof EncryptorInterface) {
@@ -178,13 +178,14 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
      * Encryptor factory. Checks and create needed encryptor
      * @param string $classFullName Encryptor namespace and name
      * @param string $secretKey Secret key for encryptor
+     * @param string $systemSalt System wide salt
      * @return EncryptorInterface
      * @throws \RuntimeException 
      */
-    private function encryptorFactory($classFullName, $secretKey) {
+    private function encryptorFactory($classFullName, $secretKey, $systemSalt) {
         $refClass = new \ReflectionClass($classFullName);
         if ($refClass->implementsInterface(self::ENCRYPTOR_INTERFACE_NS)) {
-            return new $classFullName($secretKey);
+            return new $classFullName($secretKey, $systemSalt);
         } else {
             throw new \RuntimeException('Encryptor must implements interface EncryptorInterface');
         }
@@ -213,6 +214,7 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
      * @param Doctrine\Common\Persistence\ObjectManager $em
      */
     protected function addToDecodedRegistry($entity, ObjectManager $om) {
+        return;
         $className = get_class($entity);
         $metadata = $om->getClassMetadata($className);
         $suffix = self::capitalize($metadata->getIdentifier());
