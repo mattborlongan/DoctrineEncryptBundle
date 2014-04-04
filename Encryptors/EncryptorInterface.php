@@ -12,7 +12,7 @@ interface EncryptorInterface {
     /**
      * Must accept secret key for encryption 
      */
-    public function __construct($secretKey);
+    public function __construct($secretKey, $systemSalt);
 
     /**
      * Must accept data and return encrypted data 

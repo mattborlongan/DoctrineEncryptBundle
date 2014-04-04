@@ -20,18 +20,19 @@ class RegisterServiceCompilerPass implements CompilerPassInterface {
         if ($container->hasParameter('tdm_doctrine_encrypt.encryptor_service')) {
             // Load some parameters
             $secretKey = $container->getParameter('tdm_doctrine_encrypt.secret_key');
+            $systemSalt = $container->getParameter('tdm_doctrine_encrypt.system_salt');
             $encryptorServiceId = $container->getParameter('tdm_doctrine_encrypt.encryptor_service');
 
             // Get the definitions
             $encryptorDefinition = $this->getDefinition($container, $encryptorServiceId);
 
-            $this->adjustDefinition($encryptorServiceId, $secretKey, $encryptorDefinition, $this->getDefinition($container, 'tdm_doctrine_encrypt.subscriber.encrypt'));
-            $this->adjustDefinition($encryptorServiceId, $secretKey, $encryptorDefinition, $this->getDefinition($container, 'tdm_doctrine_encrypt.subscriber.decrypt'));
+            $this->adjustDefinition($encryptorServiceId, $secretKey, $systemSalt, $encryptorDefinition, $this->getDefinition($container, 'tdm_doctrine_encrypt.subscriber.encrypt'));
+            $this->adjustDefinition($encryptorServiceId, $secretKey, $systemSalt, $encryptorDefinition, $this->getDefinition($container, 'tdm_doctrine_encrypt.subscriber.decrypt'));
         }
     }
 
-    private function adjustDefinition($encryptorServiceId, $secretKey, $encryptorDefinition, $subscriberDefinition) {
-        $encryptorDefinition->setArguments(array($secretKey));
+    private function adjustDefinition($encryptorServiceId, $secretKey, $systemSalt, $encryptorDefinition, $subscriberDefinition) {
+        $encryptorDefinition->setArguments(array($secretKey, $systemSalt));
         $subscriberDefinition->replaceArgument(2, '');
         $subscriberDefinition->addArgument(new Reference($encryptorServiceId));
     }

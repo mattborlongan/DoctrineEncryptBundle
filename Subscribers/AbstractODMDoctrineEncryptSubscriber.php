@@ -57,11 +57,11 @@ abstract class AbstractODMDoctrineEncryptSubscriber extends AbstractDoctrineEncr
             throw new \InvalidArgumentException('Invalid argument passed.');
 
         $document = $args->getDocument();
-        if (!$this->hasInDecodedRegistry($document, $args->getDocumentManager())) {
+        //if (!$this->hasInDecodedRegistry($document, $args->getDocumentManager())) {
             if ($this->processFields($document, false)) {
                 $this->addToDecodedRegistry($document, $args->getDocumentManager());
             }
-        }
+        //}
     }
 
     /**

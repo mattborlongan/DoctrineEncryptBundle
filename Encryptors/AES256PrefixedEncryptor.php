@@ -25,6 +25,12 @@ class AES256PrefixedEncryptor implements EncryptorInterface {
     private $secretKey;
 
     /**
+     * Secret key for aes algorythm
+     * @var string
+     */
+    private $systemSalt;
+
+    /**
      *
      * @var int
      */
@@ -34,8 +40,9 @@ class AES256PrefixedEncryptor implements EncryptorInterface {
      * Initialization of encryptor
      * @param string $key 
      */
-    public function __construct($key) {
+    public function __construct($key, $systemSalt) {
         $this->secretKey = $this->convertKey($key);
+        $this->systemSalt = $systemSalt;
         $this->iv_size = mcrypt_get_iv_size(self::CIPHER, self::MODE);
     }
 
@@ -64,7 +71,7 @@ class AES256PrefixedEncryptor implements EncryptorInterface {
         }
 
         // Encrypt plaintext data with given parameters
-        $encrypted = mcrypt_encrypt(self::CIPHER, $this->secretKey, $data, self::MODE, $iv);
+        $encrypted = mcrypt_encrypt(self::CIPHER, $this->secretKey, $this->systemSalt . $data, self::MODE, $iv);
 
         // Encode data with MIME base64
         $base64_encoded = base64_encode($iv . $encrypted);
@@ -97,7 +104,15 @@ class AES256PrefixedEncryptor implements EncryptorInterface {
         $iv_removed = substr($base64_decoded, $this->iv_size);
 
         // Decrypt crypttext with given parameters
-        $decrypted = mcrypt_decrypt(self::CIPHER, $this->secretKey, $iv_removed, self::MODE, $iv);
+        $decryptedWithSalt = mcrypt_decrypt(self::CIPHER, $this->secretKey, $iv_removed, self::MODE, $iv);
+
+        // Remove the salt
+        $systemSaltLength = strlen($this->systemSalt);
+        if (substr($decryptedWithSalt, 0, $systemSaltLength) === $this->systemSalt) {
+            $decrypted = substr($decryptedWithSalt, $systemSaltLength);
+        } else {
+            $decrypted = $decryptedWithSalt;
+        }
 
         // Strip NULL-bytes from the end of the string and return
         return rtrim($decrypted, "\0");

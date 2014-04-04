@@ -11,6 +11,7 @@
             <argument type="service" id="service_container" />
             <argument>%tdm_doctrine_encrypt.encryptor_class_name%</argument>
             <argument>%tdm_doctrine_encrypt.secret_key%</argument>
+            <argument>%tdm_doctrine_encrypt.system_salt%</argument>
             <tag name="doctrine_mongodb.odm.event_listener" event="prePersist" priority="-1000"/>
             <tag name="doctrine_mongodb.odm.event_listener" event="preUpdate" priority="-1000"/>
         </service>
@@ -20,9 +21,15 @@
             <argument type="service" id="service_container" />
             <argument>%tdm_doctrine_encrypt.encryptor_class_name%</argument>
             <argument>%tdm_doctrine_encrypt.secret_key%</argument>
+            <argument>%tdm_doctrine_encrypt.system_salt%</argument>
             <tag name="doctrine_mongodb.odm.event_subscriber" priority="1000"/>
         </service>
         <service id="tdm_doctrine_encrypt.subscriber.encrypt" alias="tdm_doctrine_encrypt.odm_subscriber_encrypt" />
         <service id="tdm_doctrine_encrypt.subscriber.decrypt" alias="tdm_doctrine_encrypt.odm_subscriber_decrypt" />
+        <!-- All a standard accessor for getting the object manager -->    
+        <service id="tdm_doctrine_encrypt.object_manager.odm" class="TDM\DoctrineEncryptBundle\Command\ODMOM" public="false">
+            <argument type="service" id="doctrine.odm.mongodb.document_manager" />
+        </service>
+        <service id="tdm_doctrine_encrypt.object_manager.standard" alias="tdm_doctrine_encrypt.object_manager.odm" />
     </services>
 </container>

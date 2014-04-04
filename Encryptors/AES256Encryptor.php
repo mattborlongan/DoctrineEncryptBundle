@@ -16,11 +16,18 @@ class AES256Encryptor implements EncryptorInterface {
     private $secretKey;
 
     /**
+     * Secret key for aes algorythm
+     * @var string
+     */
+    private $systemSalt;
+
+    /**
      * Initialization of encryptor
      * @param string $key 
      */
-    public function __construct($key) {
+    public function __construct($key, $systemSalt) {
         $this->secretKey = $key;
+        $this->systemSalt = $systemSalt;
     }
 
     /**
@@ -37,7 +44,7 @@ class AES256Encryptor implements EncryptorInterface {
             $iv = mcrypt_create_iv($ivSize, MCRYPT_RAND);
         }
         return trim(base64_encode(mcrypt_encrypt(
-                                MCRYPT_RIJNDAEL_256, $this->secretKey, $data, MCRYPT_MODE_ECB, $iv)));
+                                MCRYPT_RIJNDAEL_256, $this->secretKey, $this->systemSalt . $data, MCRYPT_MODE_ECB, $iv)));
     }
 
     /**
@@ -46,12 +53,12 @@ class AES256Encryptor implements EncryptorInterface {
      * @return string 
      */
     function decrypt($data, $deterministic) {
-        return trim(mcrypt_decrypt(
-                        MCRYPT_RIJNDAEL_256, $this->secretKey, base64_decode($data), MCRYPT_MODE_ECB, mcrypt_create_iv(
-                                mcrypt_get_iv_size(
-                                        MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB
-                                ), MCRYPT_RAND
-        )));
+        return trim(substr(mcrypt_decrypt(
+                                MCRYPT_RIJNDAEL_256, $this->secretKey, base64_decode($data), MCRYPT_MODE_ECB, mcrypt_create_iv(
+                                        mcrypt_get_iv_size(
+                                                MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB
+                                        ), MCRYPT_RAND
+                        )), strlen($this->systemSalt)));
     }
 
 }

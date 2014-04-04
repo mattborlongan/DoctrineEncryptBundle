@@ -37,6 +37,10 @@ class TDMDoctrineEncryptExtension extends Extension {
                 throw new \RuntimeException('You must provide "secret_key" for DoctrineEncryptBundle or "secret" for framework');
             }
         }
+        
+        if (empty($config['system_salt'])) {            
+                throw new \RuntimeException('You must provide "system_salt" for DoctrineEncryptBundle');            
+        }
 
         if (!empty($config['encryptor_class'])) {
             $encryptorFullName = $config['encryptor_class'];
@@ -46,7 +50,8 @@ class TDMDoctrineEncryptExtension extends Extension {
 
         $container->setParameter('tdm_doctrine_encrypt.encryptor_class_name', $encryptorFullName);
         $container->setParameter('tdm_doctrine_encrypt.secret_key', $config['secret_key']);
-
+        $container->setParameter('tdm_doctrine_encrypt.system_salt', $config['system_salt']);
+        
         if (!empty($config['encryptor_service'])) {
             $container->setParameter('tdm_doctrine_encrypt.encryptor_service', $config['encryptor_service']);
         }
