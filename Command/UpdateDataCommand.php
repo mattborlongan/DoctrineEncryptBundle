@@ -30,7 +30,8 @@ class UpdateDataCommand extends ContainerAwareCommand {
     protected function configure() {
         $this
                 ->setName('doctrine:encrypt:update')
-                ->setDescription('Update all data registered with Doctrine.  Encrypt and Decrypt all values as required by the annotations.');
+                ->setDescription('Update all data registered with Doctrine.  Encrypt and Decrypt all values as required by the annotations.')
+                ->addOption('mem-limit', null, InputArgument::OPTIONAL, 'Allows the memory limit to be overridden by passing in the number of MB.');
     }
 
     /**
@@ -59,7 +60,7 @@ class UpdateDataCommand extends ContainerAwareCommand {
 
     protected function getClassList() {
         $classes = array();
-        
+
         // Check each class metadata
         foreach ($this->getObjectManager()->getMetadataFactory()->getAllMetadata() as $metadata) {
 
@@ -82,7 +83,7 @@ class UpdateDataCommand extends ContainerAwareCommand {
         }
         return array_keys($classes);
     }
-    
+
     /**
      * 
      * @param ReflectionProperty $reflectionProperty
@@ -118,6 +119,17 @@ class UpdateDataCommand extends ContainerAwareCommand {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
+
+        // Set the memory limit if one is provided.
+        if (($input->hasOption('mem-limit')) && (NULL !== $input->getOption('mem-limit'))) {
+            $limit = $input->getOption('mem-limit');
+            if ((!ctype_digit($limit)) || (16384 < (int) $limit)) {
+                $output->writeln('Memory limit must be a positive integer less than or equal to 16384.');
+                return;
+            }
+            ini_set('memory_limit', $limit . 'M');
+            $output->writeln('<info>Processing with elevated memory limit of '.$limit.'M.</info>');
+        }
 
         // Get the list of all collections
         $output->writeln('<info>Loading list of classes.</info>');
