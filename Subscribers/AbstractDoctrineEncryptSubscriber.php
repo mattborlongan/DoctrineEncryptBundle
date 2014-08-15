@@ -72,14 +72,14 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
 
     /**
      * Listen a prePersist lifecycle event. Checking and encrypt entities
-     * which have @Encrypted annotation
+     * which have <code>@Encrypted</code> annotation
      * @param LifecycleEventArgs $args 
      */
     abstract public function prePersist($args);
 
     /**
      * Listen a preUpdate lifecycle event. Checking and encrypt entities fields
-     * which have @Encrypted annotation. Using changesets to avoid preUpdate event
+     * which have <code>@Encrypted</code> annotation. Using changesets to avoid preUpdate event
      * restrictions
      * @param LifecycleEventArgs $args 
      */
@@ -87,7 +87,7 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
 
     /**
      * Listen a postLoad lifecycle event. Checking and decrypt entities
-     * which have @Encrypted annotations
+     * which have <code>@Encrypted</code> annotations
      * @param LifecycleEventArgs $args 
      */
     abstract public function postLoad($args);
