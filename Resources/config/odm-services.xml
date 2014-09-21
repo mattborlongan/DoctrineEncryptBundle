@@ -8,20 +8,12 @@
         <!-- Encryption service(subscriber) for encrypt/decrypt entities properties -->    
         <service id="tdm_doctrine_encrypt.odm_subscriber_encrypt" class="TDM\DoctrineEncryptBundle\Subscribers\ODM\ODMEncrypt" public="false">
             <argument type="service" id="annotation_reader" />
-            <argument type="service" id="service_container" />
-            <argument>%tdm_doctrine_encrypt.encryptor_class_name%</argument>
-            <argument>%tdm_doctrine_encrypt.secret_key%</argument>
-            <argument>%tdm_doctrine_encrypt.system_salt%</argument>
             <tag name="doctrine_mongodb.odm.event_listener" event="prePersist" priority="-1000"/>
             <tag name="doctrine_mongodb.odm.event_listener" event="preUpdate" priority="-1000"/>
         </service>
         <!-- Decryption service(subscriber) for encrypt/decrypt entities properties -->    
         <service id="tdm_doctrine_encrypt.odm_subscriber_decrypt" class="TDM\DoctrineEncryptBundle\Subscribers\ODM\ODMDecrypt" public="false">
             <argument type="service" id="annotation_reader" />
-            <argument type="service" id="service_container" />
-            <argument>%tdm_doctrine_encrypt.encryptor_class_name%</argument>
-            <argument>%tdm_doctrine_encrypt.secret_key%</argument>
-            <argument>%tdm_doctrine_encrypt.system_salt%</argument>
             <tag name="doctrine_mongodb.odm.event_subscriber" priority="1000"/>
         </service>
         <service id="tdm_doctrine_encrypt.subscriber.encrypt" alias="tdm_doctrine_encrypt.odm_subscriber_encrypt" />

@@ -18,16 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
 
     /**
-     * Encryptor interface namespace 
-     */
-    const ENCRYPTOR_INTERFACE_NS = 'TDM\DoctrineEncryptBundle\Encryptors\EncryptorInterface';
-
-    /**
      * Encrypted annotation full name
      */
     const ENCRYPTED_ANN_NAME = 'TDM\DoctrineEncryptBundle\Configuration\Encrypted';
-    const CUSTOM_VALUE_HANDLER_EVENT = 'custom_encrypt_handler';
-
+    
     /**
      * Encryptor
      * @var EncryptorInterface 
@@ -39,12 +33,6 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
      * @var Doctrine\Common\Annotations\Reader
      */
     protected $annReader;
-
-    /**
-     *
-     * @var ContainerInterface 
-     */
-    private $container;
 
     /**
      * Registr to avoid multi decode operations for one entity
@@ -60,14 +48,9 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
      * @param EncryptorServiceInterface|NULL $service (Optional)  An EncryptorServiceInterface.  
      * This allows for the use of dependency injection for the encrypters.
      */
-    public function __construct(Reader $annReader, ContainerInterface $container, $encryptorClass, $secretKey, $systemSalt, EncryptorInterface $service = NULL) {
+    public function __construct(Reader $annReader, EncryptorInterface $service) {
         $this->annReader = $annReader;
-        $this->container = $container;
-        if ($service instanceof EncryptorInterface) {
-            $this->encryptor = $service;
-        } else {
-            $this->encryptor = $this->encryptorFactory($encryptorClass, $secretKey);
-        }
+        $this->encryptor = $service;
     }
 
     /**
@@ -156,12 +139,6 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
         return $this->handleValue($encryptorMethod, $currentValue, $annotation->getDeterministic());
     }
 
-    private function getService($customService) {
-        if ($this->container->has($customService)) {
-            return $this->container->get($customService);
-        }
-        throw new Exception('Unable to locate custom service "' . $customService . '".');
-    }
 
     /**
      * This method can be overridden to handle a specific data type differently.  
@@ -172,23 +149,6 @@ abstract class AbstractDoctrineEncryptSubscriber implements EventSubscriber {
      */
     protected function handleValue($encryptorMethod, $value, $deterministic) {
         return $this->encryptor->$encryptorMethod($value, $deterministic);
-    }
-
-    /**
-     * Encryptor factory. Checks and create needed encryptor
-     * @param string $classFullName Encryptor namespace and name
-     * @param string $secretKey Secret key for encryptor
-     * @param string $systemSalt System wide salt
-     * @return EncryptorInterface
-     * @throws \RuntimeException 
-     */
-    private function encryptorFactory($classFullName, $secretKey, $systemSalt) {
-        $refClass = new \ReflectionClass($classFullName);
-        if ($refClass->implementsInterface(self::ENCRYPTOR_INTERFACE_NS)) {
-            return new $classFullName($secretKey, $systemSalt);
-        } else {
-            throw new \RuntimeException('Encryptor must implements interface EncryptorInterface');
-        }
     }
 
     /**
