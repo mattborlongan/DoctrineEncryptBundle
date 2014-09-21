@@ -2,6 +2,7 @@
 
 1. Download TDMDoctrineEncryptBundle using composer
 2. Enable the Bundle
+3. Add configuration
 
 ### Step 1: Download TDMDoctrineEncryptBundle using composer
 
@@ -39,3 +40,7 @@ public function registerBundles()
     );
 }
 ```
+
+### Step 3: Add configuration to config.yml
+
+See details at: [Configuration reference](https://github.com/TDMobility/DoctrineEncryptBundle/blob/master/Resources/doc/configuration_reference.md)

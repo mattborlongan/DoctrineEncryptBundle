@@ -16,7 +16,7 @@ class AES256PrefixedEncryptor implements EncryptorInterface {
      * Prefix to indicate if data is encrypted
      * @var string
      */
-    private $prefix = '_ENC_';
+    private $prefix;
 
     /**
      * Secret key for aes algorythm
@@ -40,18 +40,11 @@ class AES256PrefixedEncryptor implements EncryptorInterface {
      * Initialization of encryptor
      * @param string $key 
      */
-    public function __construct($key, $systemSalt) {
+    public function __construct($key, $systemSalt, $encryptedPrefix) {
         $this->secretKey = $this->convertKey($key);
         $this->systemSalt = $systemSalt;
+        $this->prefix = $encryptedPrefix;
         $this->iv_size = mcrypt_get_iv_size(self::CIPHER, self::MODE);
-    }
-
-    /**
-     * 
-     * @param string $prefix
-     */
-    public function setPrefix($prefix) {
-        $this->prefix = $prefix;
     }
 
     /**
@@ -62,13 +55,7 @@ class AES256PrefixedEncryptor implements EncryptorInterface {
      */
     public function encrypt($data, $deterministic) {
 
-        if ($deterministic) {
-            // Return an initialization vector (IV) from a random source
-            $iv = str_repeat("\0", $this->iv_size);
-        } else {
-            // Return an initialization vector (IV) from a random source
-            $iv = mcrypt_create_iv($this->iv_size, MCRYPT_DEV_URANDOM);
-        }
+        $iv = $this->determineIV($deterministic);
 
         // Encrypt plaintext data with given parameters
         $encrypted = mcrypt_encrypt(self::CIPHER, $this->secretKey, $this->systemSalt . $data, self::MODE, $iv);
@@ -93,29 +80,15 @@ class AES256PrefixedEncryptor implements EncryptorInterface {
         if (strncmp($this->prefix, $data, strlen($this->prefix)) !== 0)
             return $data;
 
-        // Strip annotation from data
-        $annotation_removed = substr($data, strlen($this->prefix));
-
-        // Decode data encoded with MIME base64
-        $base64_decoded = base64_decode($annotation_removed);
+        // Strip annotation and decode data encoded with MIME base64
+        $base64_decoded = base64_decode(substr($data, strlen($this->prefix)));
 
         // Split Initialization Vector
         $iv = substr($base64_decoded, 0, $this->iv_size);
         $iv_removed = substr($base64_decoded, $this->iv_size);
 
-        // Decrypt crypttext with given parameters
-        $decryptedWithSalt = mcrypt_decrypt(self::CIPHER, $this->secretKey, $iv_removed, self::MODE, $iv);
-
-        // Remove the salt
-        $systemSaltLength = strlen($this->systemSalt);
-        if (substr($decryptedWithSalt, 0, $systemSaltLength) === $this->systemSalt) {
-            $decrypted = substr($decryptedWithSalt, $systemSaltLength);
-        } else {
-            $decrypted = $decryptedWithSalt;
-        }
-
-        // Strip NULL-bytes from the end of the string and return
-        return rtrim($decrypted, "\0");
+        // return decrypted, de-salted, and trimed value
+        return rtrim($this->removeSalt(mcrypt_decrypt(self::CIPHER, $this->secretKey, $iv_removed, self::MODE, $iv)), "\0");
     }
 
     /**
@@ -125,6 +98,29 @@ class AES256PrefixedEncryptor implements EncryptorInterface {
      */
     private function convertKey($secretKey) {
         return pack('H*', hash('sha256', $secretKey));
+    }
+
+    /**
+     * Return an initialization vector (IV) from a random source
+     * @param type $deterministic
+     * @return string Initialization Vecotr
+     */
+    private function determineIV($deterministic) {
+        return $deterministic ? str_repeat("\0", $this->iv_size) : mcrypt_create_iv($this->iv_size, MCRYPT_DEV_URANDOM);
+    }
+
+    /**
+     * Strips the salt off the decrypted value (if it is present)
+     * @param string $saltedDecrypted
+     * @return string
+     */
+    private function removeSalt($saltedDecrypted) {
+        $systemSaltLength = strlen($this->systemSalt);
+        if (substr($saltedDecrypted, 0, $systemSaltLength) === $this->systemSalt) {
+            return substr($saltedDecrypted, $systemSaltLength);
+        } else {
+            return $saltedDecrypted;
+        }
     }
 
 }

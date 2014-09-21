@@ -61,6 +61,22 @@ class UserV implements EncryptableInterface {
      * @var string
      */
     private $creditCardNumber;
+
+    /**
+     * Shows how to specify a value as deterministic.
+     * @ORM\Column(type="string", length=100, name="email")
+     * @Encrypted(deterministic=TRUE)
+     * @var string
+     */
+    private $email;
+
+    /**
+     * Shows how to decrypt a value.
+     * @ORM\Column(type="string", length=100, name="decrypted")
+     * @Encrypted(decrypt=TRUE)
+     * @var string
+     */
+    private $decrypted;
     
     //common getters/setters here...
 
