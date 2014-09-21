@@ -7,7 +7,7 @@ help of some encryption algorithm in database and it will be clearly for develop
 
 The bulk of the documentation is stored in the `Resources/doc/index.md` file in this bundle
 
-[Read the Documentation](https://github.com/vmelnik-ukraine/DoctrineEncryptBundle/blob/master/Resources/doc/index.md)
+[Read the Documentation](https://github.com/TDMobility/DoctrineEncryptBundle/blob/master/Resources/doc/index.md)
 
 ###License
 
