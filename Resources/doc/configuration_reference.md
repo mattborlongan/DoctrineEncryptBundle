@@ -6,14 +6,17 @@ All available configuration options are listed below with their default values.
 tdm_doctrine_encrypt:  
 # Secret key for encrypt algorithm. All secret key checks are encryptor tasks only.
     secret_key:           ~ # Required
-#  Default and only one encryptor is aes256. If you want to provide your own - set encryptor_class
-    encryptor:            aes256 
-#  If you want, you can use your own Encryptor. Encryptor must implements EncryptorInterface interface
-#  Default: TDM\DoctrineEncryptBundle\Encryptors\AES256Encryptor
-    encryptor_class:      ~ 
-#  You can optionally provide a service as an encryptor instead of specifying a class.  The service 
-#  must implement EncryptorServiceInterface.  You do not need to provide encryptor_class if you provide the service.
+# ORM and MongoDB are supported using "orm" or "odm" respectively.
+    db_driver:            ~ # Required 
+# You must provide a system salt.  This value is prefixed to data prior to 
+# being encrypted.  This prevents rainbow table attacks.
+    system_salt:          ~ # Required 
+# You can provide your own prefix value or use the default, which is "_ENC_".  
+# This is prefixed (in plain text) to every value that is encrypted.  The system 
+# will not decrypt a value which does not have the prefix.
+    encrypted_prefix:     ~ # Optional 
+# You can optionally provide a service as an encryptor.  The service must 
+# implement EncryptorServiceInterface.  If you do not provide your own service, 
+# it will use the default service which is AES256PrefixedEncryptor
     encryptor_service:    ~
-#  ORM and MongoDB are supported using "orm" or "odm" respectively.
-    db_driver:            orm 
 ```
