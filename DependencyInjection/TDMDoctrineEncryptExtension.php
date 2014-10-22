@@ -49,6 +49,7 @@ class TDMDoctrineEncryptExtension extends Extension {
             $config['encrypted_prefix'] = Configuration::defaultPrefix;
         }
 
+        $container->setParameter('tdm_doctrine_encrypt.db_driver', $config['db_driver']);
         $container->setParameter('tdm_doctrine_encrypt.secret_key', $config['secret_key']);
         $container->setParameter('tdm_doctrine_encrypt.system_salt', $config['system_salt']);
         $container->setParameter('tdm_doctrine_encrypt.encryptor_service', $config['encryptor_service']);
