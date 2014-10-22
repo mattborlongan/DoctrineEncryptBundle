@@ -55,7 +55,9 @@ class TDMDoctrineEncryptExtension extends Extension {
         $container->setParameter('tdm_doctrine_encrypt.encrypted_prefix', $config['encrypted_prefix']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load(sprintf('%s.xml', $services[$config['db_driver']]));
+        foreach($config['db_driver'] as $db_driver){
+            $loader->load(sprintf('%s.xml', $services[$db_driver]));
+        }
 
         // If default encryption service needs to be created
         if (Configuration::defaultEncryptorService === $config['encryptor_service']) {
