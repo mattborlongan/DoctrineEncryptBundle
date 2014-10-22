@@ -27,6 +27,8 @@ class UpdateDataCommand extends ContainerAwareCommand {
 
     private $objectManager;
 
+	private $standardizer;
+
     protected function configure() {
         $this
                 ->setName('doctrine:encrypt:update')
@@ -51,7 +53,7 @@ class UpdateDataCommand extends ContainerAwareCommand {
      * @return StandardizerInterface
      */
     protected function getStandardizer() {
-        return $this->getContainer()->get('tdm_doctrine_encrypt.object_manager.standard');
+		return $this->standardizer;
     }
 
     protected function getAnnotationReader() {
@@ -131,21 +133,29 @@ class UpdateDataCommand extends ContainerAwareCommand {
             $output->writeln('<info>Processing with elevated memory limit of '.$limit.'M.</info>');
         }
 
-        // Get the list of all collections
-        $output->writeln('<info>Loading list of classes.</info>');
-        foreach ($this->getClassList() as $className) {
-            // Make sure we have a repository for each class.
-            try {
-                $repository = $this->getObjectManager()->getRepository($className);
-            } catch (MappingException $ex) {
-                continue;
-            }
+		$db_drivers = $this->getContainer()->getParameter('tdm_doctrine_encrypt.db_driver');
 
-            $output->writeln('<info>Processing encryption for: "' . $className . '".</info>');
+		foreach($db_drivers as $db_driver){
+			$output->writeln('<info>Work on Driver '.$db_driver.'.</info>');
+			$this->objectManager = null;
+			$this->standardizer = $this->getContainer()->get('tdm_doctrine_encrypt.object_manager.'.$db_driver);
 
-            // Now process the repository
-            $this->processRepository($repository, $input, $output);
-        }
+			// Get the list of all collections
+			$output->writeln('<info>Loading list of classes.</info>');
+			foreach($this->getClassList() as $className){
+				// Make sure we have a repository for each class.
+				try{
+					$repository = $this->getObjectManager()->getRepository($className);
+				} catch(MappingException $ex){
+					continue;
+				}
+
+				$output->writeln('<info>Processing encryption for: "' . $className . '".</info>');
+
+				// Now process the repository
+				$this->processRepository($repository, $input, $output);
+			}
+		}
 
         $output->writeln('<info>Encryption update complete.</info>');
     }
