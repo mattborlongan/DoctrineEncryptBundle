@@ -19,6 +19,8 @@ class ODMDecrypt extends AbstractODMDoctrineEncryptSubscriber {
     public function getSubscribedEvents() {
         return array(
             Events::postLoad,
+            Events::postUpdate,
+            Events::postPersist,
         );
     }
 
