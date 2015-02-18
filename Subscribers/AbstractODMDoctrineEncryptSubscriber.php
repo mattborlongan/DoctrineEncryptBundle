@@ -45,6 +45,24 @@ abstract class AbstractODMDoctrineEncryptSubscriber extends AbstractDoctrineEncr
             $om->getUnitOfWork()->recomputeSingleDocumentChangeSet($om->getClassMetadata(get_class($document)), $document);
         }
     }
+    
+    /**
+     * Listen a postUpdate lifecycle event. Checking and decrypt entities
+     * which have @Encrypted annotations
+     * @param LifecycleEventArgs $args 
+     */
+    public function postUpdate($args) {
+        $this->postLoad($args);
+    }
+    
+    /**
+     * Listen a postPersist lifecycle event. Checking and decrypt entities
+     * which have @Encrypted annotations
+     * @param LifecycleEventArgs $args 
+     */
+    public function postPersist($args) {
+        $this->postLoad($args);
+    }
 
     /**
      * Listen a postLoad lifecycle event. Checking and decrypt entities
