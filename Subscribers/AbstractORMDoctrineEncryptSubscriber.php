@@ -53,7 +53,7 @@ abstract class AbstractORMDoctrineEncryptSubscriber extends AbstractDoctrineEncr
         $this->processFields($entity);
 
         $om = $args->getEntityManager();
-        if (!$om->getUnitOfWork()->isScheduledForDelete($document)) {
+        if (!$om->getUnitOfWork()->isScheduledForDelete($entity)) {
             $om->getUnitOfWork()->recomputeSingleEntityChangeSet($om->getClassMetadata(get_class($entity)), $entity);
         }
     }
