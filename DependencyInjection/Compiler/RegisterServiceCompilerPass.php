@@ -29,9 +29,10 @@ class RegisterServiceCompilerPass implements CompilerPassInterface {
         $container->addAliases(array($encryptorServiceId, 'tdm_doctrine_encrypt.encryptor'));
         
         // Add service as argument on listeners.
-        $this->getDefinition($container, 'tdm_doctrine_encrypt.subscriber.encrypt')->addArgument($encrypterServiceReference);
-        $this->getDefinition($container, 'tdm_doctrine_encrypt.subscriber.decrypt')->addArgument($encrypterServiceReference);
-        
+        foreach($container->getParameter('tdm_doctrine_encrypt.db_driver') as $db_driver){
+            $this->getDefinition($container, 'tdm_doctrine_encrypt.'.$db_driver.'_subscriber.encrypt')->addArgument($encrypterServiceReference);
+            $this->getDefinition($container, 'tdm_doctrine_encrypt.'.$db_driver.'_subscriber.decrypt')->addArgument($encrypterServiceReference);
+        }
     }
 
     /**

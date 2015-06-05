@@ -24,7 +24,9 @@ class ODMDoctrineEncryptSubscriber extends AbstractDoctrineEncryptSubscriber {
     public function getSubscribedEvents() {
         return array(
             Events::prePersist,
+            Events::postPersist,
             Events::preUpdate,
+            Events::postUpdate,
             Events::postLoad,
         );
     }
@@ -57,6 +59,24 @@ class ODMDoctrineEncryptSubscriber extends AbstractDoctrineEncryptSubscriber {
         if (!$om->getUnitOfWork()->isScheduledForDelete($document)) {
             $om->getUnitOfWork()->recomputeSingleDocumentChangeSet($om->getClassMetadata(get_class($document)), $document);
         }
+    }
+    
+    /**
+     * Listen a postUpdate lifecycle event. Checking and decrypt entities
+     * which have @Encrypted annotations
+     * @param LifecycleEventArgs $args 
+     */
+    public function postUpdate($args) {
+        $this->postLoad($args);
+    }
+    
+    /**
+     * Listen a postPersist lifecycle event. Checking and decrypt entities
+     * which have @Encrypted annotations
+     * @param LifecycleEventArgs $args 
+     */
+    public function postPersist($args) {
+        $this->postLoad($args);
     }
 
     /**

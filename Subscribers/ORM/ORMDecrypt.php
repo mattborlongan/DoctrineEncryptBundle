@@ -19,6 +19,8 @@ class ORMDecrypt extends AbstractORMDoctrineEncryptSubscriber {
     public function getSubscribedEvents() {
         return array(
             Events::postLoad,
+            Events::postUpdate,
+            Events::postPersist,
         );
     }
 

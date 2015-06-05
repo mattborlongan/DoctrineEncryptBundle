@@ -6,22 +6,20 @@
         
     <services>
         <!-- Encryption service(subscriber) for encrypt/decrypt entities properties -->    
-        <service id="tdm_doctrine_encrypt.orm_subscriber_encrypt" class="TDM\DoctrineEncryptBundle\Subscribers\ORM\ORMEncrypt" public="false">
+        <service id="tdm_doctrine_encrypt.orm_subscriber.encrypt" class="TDM\DoctrineEncryptBundle\Subscribers\ORM\ORMEncrypt">
             <argument type="service" id="annotation_reader" />
             <tag name="doctrine.event_listener" event="prePersist" priority="-1000"/>
             <tag name="doctrine.event_listener" event="preUpdate" priority="-1000"/>
         </service>
         <!-- Decryption service(subscriber) for encrypt/decrypt entities properties -->    
-        <service id="tdm_doctrine_encrypt.orm_subscriber_decrypt" class="TDM\DoctrineEncryptBundle\Subscribers\ORM\ORMDecrypt" public="false">
+        <service id="tdm_doctrine_encrypt.orm_subscriber.decrypt" class="TDM\DoctrineEncryptBundle\Subscribers\ORM\ORMDecrypt">
             <argument type="service" id="annotation_reader" />
             <tag name="doctrine.event_subscriber" priority="1000"/>
         </service>
-        <service id="tdm_doctrine_encrypt.subscriber.encrypt" alias="tdm_doctrine_encrypt.orm_subscriber_encrypt" />
-        <service id="tdm_doctrine_encrypt.subscriber.decrypt" alias="tdm_doctrine_encrypt.orm_subscriber_decrypt" />
+
         <!-- All a standard accessor for getting the object manager -->    
-        <service id="tdm_doctrine_encrypt.object_manager.orm" class="TDM\DoctrineEncryptBundle\Command\ORMOM" public="false">
+        <service id="tdm_doctrine_encrypt.object_manager.orm" class="TDM\DoctrineEncryptBundle\Command\ORMOM">
             <argument type="service" id="doctrine.orm.entity_manager" />
         </service>
-        <service id="tdm_doctrine_encrypt.object_manager.standard" alias="tdm_doctrine_encrypt.object_manager.orm" />
     </services>
 </container>
