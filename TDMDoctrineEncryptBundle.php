@@ -2,6 +2,7 @@
 
 namespace TDM\DoctrineEncryptBundle;
 
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -16,7 +17,7 @@ class TDMDoctrineEncryptBundle extends Bundle {
         $container->addCompilerPass(new RegisterServiceCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
     
-    public function getContainerExtension()
+    public function getContainerExtension(): ?ExtensionInterface
     {
         return new TDMDoctrineEncryptExtension();
     }

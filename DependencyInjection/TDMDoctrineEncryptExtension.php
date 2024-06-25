@@ -66,7 +66,7 @@ class TDMDoctrineEncryptExtension extends Extension {
         }
     }
 
-    public function getAlias() {
+    public function getAlias(): string  {
         return 'tdm_doctrine_encrypt';
     }
 
